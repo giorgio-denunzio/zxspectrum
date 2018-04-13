@@ -1,5 +1,5 @@
-; http://zxsnippets.wikia.com/wiki/Clearing_screen
-; http://www.breakintoprogram.co.uk/computers/zx-spectrum/interrupts
+; testJoffa.asm
+; by Giorgio De Nunzio
 
 screenMem  equ 4000h
 attributeMem equ 5800h
