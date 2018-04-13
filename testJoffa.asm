@@ -1,4 +1,3 @@
-
 ; http://zxsnippets.wikia.com/wiki/Clearing_screen
 ; http://www.breakintoprogram.co.uk/computers/zx-spectrum/interrupts
 
@@ -19,6 +18,7 @@ loop
 	out (0feh),a
 
 	call waitForLowerPartOfScreen	; wait for a central/lower part of the screen where 40h was inserted as attrib
+;	call waitForLowerPartOfScreen1	; wait for a central/lower part of the screen where 40h was inserted as attrib
 
 	ld a,5 			; change to cyan border
 	out (0feh),a
@@ -31,17 +31,21 @@ loop
 ; (for Joffa-like syncronization) and another line of black on yellow (to see where it is!!)
 
 setUpTheScreen
-	ld hl,attributeMem	; clear the screen (stupid and slow ldir stuff)
+
+; clear the screen attributes, white ink on black paper (stupid and slow ldir stuff)
+	ld hl,attributeMem
 	ld de,attributeMem+1 
 	ld a,7			; 0 0 000 111 white ink on black paper
 	ld (hl),a
 	ld bc,20h * 24 - 1
 	ldir
 
-	ld hl,attributeMem	; now set the bright black on black line, for "in" instruction to read
+; prepare attribute setting
+	ld hl,attributeMem
 	ld bc,20h*10
 	add hl,bc		; point to the 11th line	
 
+; now set the bright black on black line, for "in" instruction to read (Joffa)
 	ld a,40h		; black ink on black paper with brightness: 0 1 000 000
 	ld b,20h		; fill the whole line with 40h
 fillLineWith40h
@@ -49,6 +53,7 @@ fillLineWith40h
 	inc hl
 	djnz fillLineWith40h
 
+; now set a stripe of black ink on yellow paper
 	ld a,30h		; black ink on yellow paper: 0 0 110 000
 	ld b,20h		; fill the whole line with 30h
 fillLineWith30h
@@ -56,9 +61,16 @@ fillLineWith30h
 	inc hl
 	djnz fillLineWith30h
 
-	ld hl,4000h + 0800h	; now insert a 40h as a pixel byte value
+; insert some pixel values at 40h
+	if 0
+	ld hl,4000h + 0800h	; now insert some 40h as pixel byte values
 	ld a,40h
+	ld b,20h
+fillPixelLineWith04h
 	ld (hl),a
+	inc hl
+	djnz fillPixelLineWith04h
+	endif
 	ret
 
 ;-----------------------------------------------------------------------------
