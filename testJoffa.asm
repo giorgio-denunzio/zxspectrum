@@ -128,7 +128,7 @@ waitForLowerPartOfScreenLoop3
 ;----------------------------------------------------------------------------
 waitForLowerPartOfScreen4
 	ld bc,0ffffh
-	ld e, 40h     ; or ld e,40h
+	ld e, 40h
 waitForLowerPartOfScreenLoop4
 	in a,(c)
 	cp e
