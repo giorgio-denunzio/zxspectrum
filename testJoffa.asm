@@ -17,8 +17,7 @@ loop
 	ld a,3			; change to magenta border
 	out (0feh),a
 
-	call waitForLowerPartOfScreen	; wait for a central/lower part of the screen where 40h was inserted as attrib
-;	call waitForLowerPartOfScreen1	; wait for a central/lower part of the screen where 40h was inserted as attrib
+	call waitForLowerPartOfScreen5	; wait for a central/lower part of the screen where 40h was inserted as attrib
 
 	ld a,5 			; change to cyan border
 	out (0feh),a
@@ -62,7 +61,7 @@ fillLineWith30h
 	djnz fillLineWith30h
 
 ; insert some pixel values at 40h
-	if 0
+	if 01
 	ld hl,4000h + 0800h	; now insert some 40h as pixel byte values
 	ld a,40h
 	ld b,20h
@@ -90,23 +89,64 @@ setUpTheInterrupt
 
 ;----------------------------------------------------------------------------
 waitForLowerPartOfScreen
-	ld a,40h
-	ld e,a     ; or ld e,40h
-waitForLowerPartOfScreenLoop:
+waitForLowerPartOfScreenLoop
+	ld a,0ffh
 	in a,(0ffh)
-	cp e
+	cp 40h
 	jr nz,waitForLowerPartOfScreenLoop
 	ret
 
+
 ;----------------------------------------------------------------------------
 waitForLowerPartOfScreen1
-	ld bc,40ffh
-	ld e,b      ; or ld e,40h
 waitForLowerPartOfScreenLoop1
-	in a,(c)
-	cp e
+	ld a,040h
+	in a,(0ffh)
+	cp 40h
 	jr nz,waitForLowerPartOfScreenLoop1
 	ret
+
+;----------------------------------------------------------------------------
+waitForLowerPartOfScreen2
+	ld a,040h
+waitForLowerPartOfScreenLoop2
+	in a,(0ffh)
+	cp 40h
+	jr nz,waitForLowerPartOfScreenLoop2
+	ret
+
+;----------------------------------------------------------------------------
+waitForLowerPartOfScreen3
+waitForLowerPartOfScreenLoop3
+	xor a
+	in a,(0ffh)
+	inc a
+	jr z,waitForLowerPartOfScreenLoop3
+	ret
+
+
+;----------------------------------------------------------------------------
+waitForLowerPartOfScreen4
+	ld bc,0ffffh
+	ld e, 40h     ; or ld e,40h
+waitForLowerPartOfScreenLoop4
+	in a,(c)
+	cp e
+	jr nz,waitForLowerPartOfScreenLoop4
+	ret
+
+
+
+;----------------------------------------------------------------------------
+waitForLowerPartOfScreen5
+	ld e,40h
+	ld a,0ffh
+waitForLowerPartOfScreenLoop5
+	in a,(0ffh)
+	cp 40h
+	jr nz,waitForLowerPartOfScreenLoop5
+	ret
+
 ;-----------------------------------------------------------------------------
 ; just a stub, does nothing
 interrupt:
